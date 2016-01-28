@@ -6,6 +6,7 @@ skip=false
 bkup=false
 ctag="UserComment"
 
+VERSION=0.1
 USAGE="
 usage:
     $(basename $0) [options] image [image2 ...]
@@ -20,6 +21,7 @@ options:
     -b, --backup        save a backup of image suffixed with '_original'
     -c, --ctag tag      write comments to tag other than '$ctag'
     -h, --help          print this message and exit
+    -v, --version       print version info and exit
 "
 
 while [[ $1 == -* ]]; do
@@ -36,6 +38,10 @@ while [[ $1 == -* ]]; do
             ;;
         -h|--help)
             echo "$USAGE"
+            exit
+            ;;
+        -v|--version)
+            echo "$(basename $0) version $VERSION"
             exit
             ;;
         *)
