@@ -1,4 +1,7 @@
 #!/bin/bash
+# exifcomment - graphical editor for exif comment tags
+# (c) 2016 Dan Fekete, released under the WTFPL, see COPYING for details
+
 skip=false
 bkup=false
 ctag="UserComment"
