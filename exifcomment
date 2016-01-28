@@ -1,0 +1,94 @@
+#!/bin/bash
+skip=false
+bkup=false
+ctag="UserComment"
+
+USAGE="
+usage:
+    $(basename $0) [options] image [image2 ...]
+
+    Edit EXIF comment tag in pictures. Uses yad for gui, exiftool to edit tags
+    and convert (imagemagic) for image resizing. Opens a window with yad. Click
+    OK to save comment to image, click cancel to skip editing an image & press
+    escape or close window to quit editing altogether.
+
+options:
+    -s, --skip          skip pictures that already have the comment flag
+    -b, --backup        save a backup of image suffixed with '_original'
+    -c, --ctag tag      write comments to tag other than '$ctag'
+    -h, --help          print this message and exit
+"
+
+while [[ $1 == -* ]]; do
+    case $1 in
+        -s|--skip)
+            skip=true
+            ;;
+        -b|--backup)
+            bkup=true
+            ;;
+        -c|--ctag)
+            ctag="$2"
+            shift
+            ;;
+        -h|--help)
+            echo "$USAGE"
+            exit
+            ;;
+        *)
+            >&2 echo "unknown option '$1'," \
+                "run $(basename $0) --help for usage info"
+            exit 1
+    esac
+    shift
+done
+
+if ! which yad >/dev/null; then
+   >&2 echo "yad not found!"
+   exit 1
+fi
+
+if ! which exiftool >/dev/null; then
+   >&2 echo "exiftool not found!"
+   exit 1
+fi
+
+if ! which convert >/dev/null; then
+   >&2 echo "convert not found!"
+   exit 1
+fi
+
+if [ $# -lt 1 ]; then
+    >&2 echo "no files given, nothing to do.. Tschüß!"
+    exit 1
+fi
+
+for f in "$@"; do
+    current_comment=$(exiftool -s3 -$ctag "$f")
+    if [ -n "$current_comment" ] && [ "$skip" = true ]; then
+        continue
+    fi
+    thumb="thumb.$(basename "$f")"
+    convert -sample 600x480 "$f" "$thumb"  # sample is the fastes resize method
+    comment=$(yad --image-on-top --image="$thumb" \
+        --form --field="New Comment" \
+        --title="Change EXIF comment tags" \
+        "$current_comment" 2>/dev/null)
+    ret=$?
+    rm "$thumb"
+    case $ret in
+        0)
+            # User pressed OK, update tag
+            exiftool $([ "$bkup" = false ] && echo "-overwrite_original") \
+                -$ctag="${comment%*|}" "$f"
+            ;;
+        1)
+            # User pressed Cancel, skip this pic
+            continue
+            ;;
+        252)
+            # User hit ESC or closed window, abort
+            exit 0
+            ;;
+    esac
+done
