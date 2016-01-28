@@ -1,6 +1,6 @@
 # exifcomment
 
-Edits EXIF comment tag in jpegs. Uses yad for gui, exiftool to edit tags and convert (imagemagic) for image resizing. Opens a window with yad. Click OK to save comment to image, click cancel to skip editing an image & press escape or close window to quit editing altogether.
+Edits EXIF comment tag in jpegs. Uses `yad` for gui, `exiftool` to edit tags and `convert` (imagemagic) for image resizing. Opens a window with yad. Click OK to save comment to image, click cancel to skip editing an image & press escape or close window to quit editing altogether.
 
 ## Usage
 ```sh
@@ -13,6 +13,18 @@ Edits EXIF comment tag in jpegs. Uses yad for gui, exiftool to edit tags and con
 -b, --backup        save a backup of image suffixed with '_original'
 -c, --ctag tag      write comments to tag other than '$ctag'
 -h, --help          print this message and exit
+```
+
+## Prerequisites
+Needs the following programs:
+
+  * yad
+  * exiftool
+  * convert
+
+You can install these in ubuntu/debian with the following:
+```sh
+sudo apt-get install yad exiftool imagemagic
 ```
 
 ## Examples
